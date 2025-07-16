@@ -27,7 +27,7 @@ local function sendHeartbeat()
 
     local payload = {
         pc_name = config.PC_NAME,
-        account = config.DASHBOARD_ACCOUNT,
+        account = config.USERNAME_ACCOUNT,
         username = LocalPlayer.Name
     }
 
