@@ -1,0 +1,101 @@
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local GuiService = game:GetService("GuiService")
+local TeleportService = game:GetService("TeleportService")
+
+local LocalPlayer = Players.LocalPlayer
+local isSystemActive = true
+local lastHeartbeatSent = 0
+
+-- ==============================================================================
+-- ===                       Core Heartbeat Logic                           ===
+-- ==============================================================================
+
+local function stopSystem(reason)
+    if not isSystemActive then return end
+    isSystemActive = false
+    print(string.format("Heartbeat System: Stopping. Reason: %s", reason))
+end
+
+local function sendHeartbeat()
+    if not isSystemActive or not LocalPlayer or not LocalPlayer.Name or (tick() - lastHeartbeatSent < config.HEARTBEAT_INTERVAL) then
+        return
+    end
+
+    lastHeartbeatSent = tick()
+
+    local payload = {
+        pc_name = config.PC_NAME,
+        account = config.DASHBOARD_ACCOUNT,
+        username = LocalPlayer.Name
+    }
+
+    local requestData = {
+        Url = config.SERVER_URL .. "/api/heartbeat/lua",
+        Method = "POST",
+        Headers = { ["Content-Type"] = "application/json" },
+        Body = HttpService:JSONEncode(payload)
+    }
+
+    task.spawn(function()
+        if not http_request then
+            warn("Heartbeat System: 'http_request' function not available in this executor.")
+            stopSystem("http_request not found")
+            return
+        end
+        
+        local success, response = pcall(function()
+            return http_request(requestData)
+        end)
+
+        if not success then
+            warn("Heartbeat System: Critical error calling http_request: " .. tostring(response))
+        elseif response and not response.Success then
+            warn(string.format("Heartbeat System: Failed to send. Code: %s, Message: %s, Body: %s",
+                tostring(response.StatusCode), tostring(response.StatusMessage), tostring(response.Body)))
+        end
+    end)
+end
+
+-- ==============================================================================
+-- ===                         Event Listeners & Main Loop                  ===
+-- ==============================================================================
+
+if not LocalPlayer then
+    print("Heartbeat System: Waiting for LocalPlayer...")
+    LocalPlayer = Players.PlayerAdded:Wait()
+end
+
+-- เริ่มต้นระบบโดยตรง ไม่ต้องโหลด config จากไฟล์
+print(string.format("Heartbeat System: Initialized for %s (ID: %d) on PC '%s'", LocalPlayer.Name, LocalPlayer.UserId, config.PC_NAME))
+
+GuiService.ErrorMessageChanged:Connect(function()
+    local errorCode = GuiService:GetErrorCode().Value
+    if errorCode >= Enum.ConnectionError.DisconnectErrors.Value then
+        local errorName = "Unknown"
+        for _, enumItem in ipairs(Enum.ConnectionError:GetEnumItems()) do
+            if enumItem.Value == errorCode then
+                errorName = enumItem.Name
+                break
+            end
+        end
+        stopSystem(string.format("Game Disconnect Error (%d: %s)", errorCode, errorName))
+    end
+end)
+
+TeleportService.TeleportInitFailed:Connect(function(player, teleportResult, errorMessage)
+    if player == LocalPlayer then
+        stopSystem(string.format("Teleport Failed (%s)", teleportResult.Name))
+    end
+end)
+
+LocalPlayer.OnTeleport:Connect(function(teleportState)
+    if teleportState == Enum.TeleportState.Started then
+        stopSystem("Teleport Started")
+    end
+end)
+
+print("Heartbeat System: Event handlers connected.")
+RunService.Heartbeat:Connect(sendHeartbeat)
+print("--- Heartbeat System is now active. ---")
