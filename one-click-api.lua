@@ -19,20 +19,20 @@ local function stopSystem(reason)
 end
 
 local function sendHeartbeat()
-    if not isSystemActive or not LocalPlayer or not LocalPlayer.Name or (tick() - lastHeartbeatSent < config.HEARTBEAT_INTERVAL) then
+    if not isSystemActive or not LocalPlayer or not LocalPlayer.Name or (tick() - lastHeartbeatSent < one_click_config.HEARTBEAT_INTERVAL) then
         return
     end
 
     lastHeartbeatSent = tick()
 
     local payload = {
-        pc_name = config.PC_NAME,
-        account = config.USERNAME_ACCOUNT,
+        pc_name = one_click_config.PC_NAME,
+        account = one_click_config.USERNAME_ACCOUNT,
         username = LocalPlayer.Name
     }
 
     local requestData = {
-        Url = config.SERVER_URL .. "/api/heartbeat/lua",
+        Url = one_click_config.SERVER_URL .. "/api/heartbeat/lua",
         Method = "POST",
         Headers = { ["Content-Type"] = "application/json" },
         Body = HttpService:JSONEncode(payload)
@@ -68,7 +68,7 @@ if not LocalPlayer then
 end
 
 -- เริ่มต้นระบบโดยตรง ไม่ต้องโหลด config จากไฟล์
-print(string.format("Heartbeat System: Initialized for %s (ID: %d) on PC '%s'", LocalPlayer.Name, LocalPlayer.UserId, config.PC_NAME))
+print(string.format("Heartbeat System: Initialized for %s (ID: %d) on PC '%s'", LocalPlayer.Name, LocalPlayer.UserId, one_click_config.PC_NAME))
 
 GuiService.ErrorMessageChanged:Connect(function()
     local errorCode = GuiService:GetErrorCode().Value
