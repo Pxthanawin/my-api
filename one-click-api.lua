@@ -8,9 +8,14 @@ local LocalPlayer = Players.LocalPlayer
 local isSystemActive = true
 local lastHeartbeatSent = 0
 
--- ==============================================================================
--- ===                       Core Heartbeat Logic                           ===
--- ==============================================================================
+if not one_click_config or not one_click_config.HEARTBEAT_SERVER_URL or not one_click_config.PC_NAME or not one_click_config.USERNAME_ACCOUNT or not one_click_config.HEARTBEAT_INTERVAL then
+    warn("Heartbeat System: CRITICAL ERROR - 'one_click_config' is incomplete. Make sure HEARTBEAT_SERVER_URL is set by the client.")
+    isSystemActive = false
+    return
+end
+
+local HEARTBEAT_ENDPOINT = one_click_config.HEARTBEAT_SERVER_URL .. "/api/heartbeat/lua"
+
 
 local function stopSystem(reason)
     if not isSystemActive then return end
@@ -32,7 +37,7 @@ local function sendHeartbeat()
     }
 
     local requestData = {
-        Url = one_click_config.SERVER_URL .. "/api/heartbeat/lua",
+        Url = HEARTBEAT_ENDPOINT,
         Method = "POST",
         Headers = { ["Content-Type"] = "application/json" },
         Body = HttpService:JSONEncode(payload)
@@ -44,7 +49,7 @@ local function sendHeartbeat()
             stopSystem("http_request not found")
             return
         end
-        
+
         local success, response = pcall(function()
             return http_request(requestData)
         end)
@@ -52,8 +57,6 @@ local function sendHeartbeat()
         if not success then
             warn("Heartbeat System: Critical error calling http_request: " .. tostring(response))
         elseif response and not response.Success then
-            warn(string.format("Heartbeat System: Failed to send. Code: %s, Message: %s, Body: %s",
-                tostring(response.StatusCode), tostring(response.StatusMessage), tostring(response.Body)))
         end
     end)
 end
@@ -67,8 +70,8 @@ if not LocalPlayer then
     LocalPlayer = Players.PlayerAdded:Wait()
 end
 
--- เริ่มต้นระบบโดยตรง ไม่ต้องโหลด config จากไฟล์
 print(string.format("Heartbeat System: Initialized for %s (ID: %d) on PC '%s'", LocalPlayer.Name, LocalPlayer.UserId, one_click_config.PC_NAME))
+print("Heartbeat System: Target URL -> " .. HEARTBEAT_ENDPOINT)
 
 GuiService.ErrorMessageChanged:Connect(function()
     local errorCode = GuiService:GetErrorCode().Value
