@@ -32,7 +32,7 @@ local function sendHeartbeat()
 
     local payload = {
         pc_name = one_click_config.PC_NAME,
-        account = one_click_config.USERNAME_ACCOUNT,
+        account = one_click_config.ONE_CLICK_USERNAME,
         username = LocalPlayer.Name
     }
 
