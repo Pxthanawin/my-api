@@ -85,6 +85,8 @@ GuiService.ErrorMessageChanged:Connect(function()
         end
         stopSystem(string.format("Game Disconnect Error (%d: %s)", errorCode, errorName))
     end
+    task.wait(1)
+    game:Shutdown()
 end)
 
 TeleportService.TeleportInitFailed:Connect(function(player, teleportResult, errorMessage)
