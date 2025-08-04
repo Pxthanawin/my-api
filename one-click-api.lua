@@ -8,6 +8,8 @@ local LocalPlayer = Players.LocalPlayer
 local isSystemActive = true
 local lastHeartbeatSent = 0
 
+one_click_config.HEARTBEAT_INTERVAL = 6
+
 if not one_click_config or not one_click_config.HEARTBEAT_SERVER_URL or not one_click_config.PC_NAME or not one_click_config.ONE_CLICK_USERNAME or not one_click_config.HEARTBEAT_INTERVAL then
     warn("Heartbeat System: CRITICAL ERROR - 'one_click_config' is incomplete. Make sure HEARTBEAT_SERVER_URL is set by the client.")
     isSystemActive = false
