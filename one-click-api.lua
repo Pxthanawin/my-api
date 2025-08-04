@@ -1,3 +1,5 @@
+repeat task.wait() until one_click_config
+
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
