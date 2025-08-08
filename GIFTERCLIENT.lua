@@ -146,9 +146,11 @@ task.spawn(function()
                             if (LocalPlayer.Character.HumanoidRootPart.Position - targetPos).Magnitude > 10 then return end
                             _G.Settings = {
                                 ['USERNAME'] = {
-                                targetplayer.Name
-                            },
-                                ['PET_SELECT'] = havePET
+                                    targetplayer.Name
+                                },
+                                ['PET_SELECT'] = {
+                                    havePET
+                                }
                             }
                             --[[
                             task.wait(0.25)
@@ -168,7 +170,7 @@ task.spawn(function()
 
             _G.Settings = {
                 ['USERNAME'] = {},
-                ['PET_SELECT'] = nil
+                ['PET_SELECT'] = {}
             }
 
         end)
