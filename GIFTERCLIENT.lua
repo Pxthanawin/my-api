@@ -12,7 +12,6 @@ task.spawn(function()
     local isSystemActive = false
     local lastHeartbeatSent = 0
     local havePET
-    local PETTARGET
 
     local Players = game:GetService("Players")
     local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -21,6 +20,15 @@ task.spawn(function()
     local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
     local camera = workspace.Camera
+
+    local function findIndex(tbl, value)
+        for i, v in ipairs(tbl) do
+            if v == value then
+                return i
+            end
+        end
+        return nil
+    end
 
     local function sendHeartbeat()
 
@@ -67,29 +75,37 @@ task.spawn(function()
     end
 
     local checkPet = function()
-        if not (PETTARGET and PETTARGET.Parent) then
-            for _, child in ipairs(LocalPlayer.Backpack:GetChildren()) do
-                local np = NAME_PET(child)
-                if np and table.find(PetList, np) then
-                    isSystemActive = true
-                    PETTARGET = child
-                    havePET = np
-                    return
+        isSystemActive = false
+        local bestPet = nil
+        havePET = nil
+        for _, child in ipairs(LocalPlayer.Backpack:GetChildren()) do
+            local np = NAME_PET(child)
+            if np and table.find(PetList, np) then
+                if havePET and havePET ~= np then
+                    if findIndex(PetList, np) >= bestPet then
+                        continue
+                    end
+                elseif havePET == np then continue
                 end
+                bestPet = findIndex(PetList, np)
+                isSystemActive = true
+                havePET = np
             end
-            local child = LocalPlayer.Character:FindFirstChildOfClass("Tool")
-            if child then
-                local np = NAME_PET(child)
-                if np and table.find(PetList, np) then
-                    isSystemActive = true
-                    PETTARGET = child
-                    havePET = np
-                    return
+        end
+        local child = LocalPlayer.Character:FindFirstChildOfClass("Tool")
+        if child then
+            local np = NAME_PET(child)
+            if np and table.find(PetList, np) then
+                if havePET and havePET ~= np then
+                    if findIndex(PetList, np) >= bestPet then
+                        return
+                    end
+                elseif havePET == np then return
                 end
+                bestPet = findIndex(PetList, np)
+                isSystemActive = true
+                havePET = np
             end
-            isSystemActive = false
-            PETTARGET = nil
-            havePET = nil
         end
     end
 
@@ -120,9 +136,7 @@ task.spawn(function()
 
             checkPet()
 
-            if #(Players:GetChildren()) == 1 then return end
-
-            while #checktargetpet() ~= 0 do
+            while #(Players:GetChildren()) ~= 1 and #checktargetpet() ~= 0 do
                 task.wait()
                 isSystemActive = false
                 pcall(function()
