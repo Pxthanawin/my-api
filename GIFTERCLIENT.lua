@@ -21,6 +21,10 @@ task.spawn(function()
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
     local camera = workspace.Camera
 
+    repeat
+        task.wait()
+    until LocalPlayer:GetAttribute("DataFullyLoaded") and LocalPlayer:GetAttribute("Finished_Loading") and LocalPlayer:GetAttribute("Setup_Finished")
+
     local function findIndex(tbl, value)
         for i, v in ipairs(tbl) do
             if v == value then
