@@ -144,7 +144,7 @@ task.spawn(function()
                 task.wait()
                 isSystemActive = false
                 pcall(function()
-                    for _, pet in ipairs(gift_petlist) do
+                    --for _, pet in ipairs(gift_petlist) do
                         --[[
                         LocalPlayer.Character.Humanoid:EquipTool(pet)
                         if pet:GetAttribute("d") then
@@ -182,14 +182,9 @@ task.spawn(function()
                             end]]
                             task.wait(2)
                         end
-                    end
+                    --end
                 end)
             end
-
-            _G.Settings = {
-                ['USERNAME'] = {},
-                ['PET_SELECT'] = {}
-            }
 
         end)
     end
