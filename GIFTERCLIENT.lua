@@ -135,7 +135,7 @@ task.spawn(function()
         camera.CFrame = CFrame.new(cameraPosition, cameraLookAt)
     end
 
-    while task.wait(5) do
+    while task.wait(15) do
         pcall(function()
 
             checkPet()
