@@ -51,7 +51,7 @@ task.spawn(function()
             Headers = {
                 ["Content-Type"] = "application/json"
             },
-            Body = HttpService:JSONEncode({ userId = userId, username = LocalPlayer.Name, PRIVATESERVER_URL = one_click_config.PRIVATESERVER_URL, havePET = havePET, PC_NAME = one_click_config["PC_NAME"]})
+            Body = HttpService:JSONEncode({ userId = userId, username = LocalPlayer.Name, PRIVATESERVER_URL = one_click_config.PRIVATESERVER_URL, havePET = havePET, ACCOUNT = one_click_config.ONE_CLICK_USERNAME, PC_NAME = one_click_config["PC_NAME"]})
         }
 
 
